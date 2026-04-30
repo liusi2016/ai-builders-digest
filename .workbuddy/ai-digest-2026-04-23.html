@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Builders Digest</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.7;
+      color: #333;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── 侧边栏 ── */
+    .sidebar {
+      width: 300px;
+      flex-shrink: 0;
+      background: #1a1a2e;
+      color: #fff;
+      padding: 24px 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sidebar-header {
+      text-align: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar-header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-header .subtitle {
+      font-size: 12px;
+      color: #a0aec0;
+    }
+
+    /* 日历 */
+    .calendar {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .calendar-header .month {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 6px;
+    }
+
+    .calendar-nav button {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #fff;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+
+    .calendar-nav button:hover { background: rgba(255,255,255,0.2); }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      margin-bottom: 4px;
+    }
+
+    .calendar-weekdays span {
+      text-align: center;
+      font-size: 10px;
+      color: #a0aec0;
+      padding: 3px 0;
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .calendar-day:hover { background: rgba(255,255,255,0.1); }
+
+    .calendar-day.other-month { color: #4a5568; }
+
+    .calendar-day.today {
+      background: #667eea;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .calendar-day.has-report::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      width: 5px;
+      height: 5px;
+      background: #48bb78;
+      border-radius: 50%;
+    }
+
+    .calendar-day.selected {
+      background: rgba(102,126,234,0.3);
+      border: 2px solid #667eea;
+    }
+
+    /* 日报列表 */
+    .report-list-title {
+      font-size: 11px;
+      color: #a0aec0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .report-item {
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .report-item:hover {
+      background: rgba(255,255,255,0.1);
+      border-left-color: #667eea;
+    }
+
+    .report-item.active {
+      background: rgba(102,126,234,0.2);
+      border-left-color: #667eea;
+    }
+
+    .report-item .date {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .report-item .preview {
+      font-size: 11px;
+      color: #a0aec0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ── 主内容区 ── */
+    .main {
+      flex: 1;
+      padding: 32px 40px;
+      overflow-y: auto;
+    }
+
+    .content-container {
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    /* 顶部快捷导航 */
+    .quick-nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .quick-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      color: #4a5568;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .quick-nav-btn:hover {
+      background: #667eea;
+      border-color: #667eea;
+      color: #fff;
+    }
+
+    .report-header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+      padding: 36px 40px;
+      border-radius: 16px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .report-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .report-header .date {
+      color: #a0aec0;
+      font-size: 16px;
+    }
+
+    .report-content {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 36px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    .section {
+      margin-bottom: 36px;
+      scroll-margin-top: 16px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #667eea;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .builder-card {
+      background: #f7fafc;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      border-left: 4px solid #667eea;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .builder-card:hover {
+      transform: translateX(3px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+    }
+
+    .builder-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+
+    .builder-content {
+      color: #4a5568;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .builder-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #667eea;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .builder-link:hover { text-decoration: underline; }
+
+    .blog-card {
+      background: #f7fafc;
+      border-radius: 10px;
+      padding: 18px 20px;
+      border-left: 4px solid #48bb78;
+    }
+
+    .blog-card .blog-source {
+      font-size: 11px;
+      color: #48bb78;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .blog-card .blog-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+
+    .blog-card .blog-content {
+      color: #4a5568;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .blog-card .blog-link {
+      color: #48bb78;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .blog-card .blog-link:hover { text-decoration: underline; }
+
+    .podcast-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 14px;
+      padding: 28px;
+      color: #fff;
+    }
+
+    .podcast-card .podcast-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .podcast-card .speaker {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-bottom: 14px;
+    }
+
+    .podcast-card .summary {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 12px;
+    }
+
+    .podcast-card .quote {
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 14px;
+      margin: 14px 0;
+      font-style: italic;
+      border-left: 3px solid rgba(255,255,255,0.5);
+      font-size: 14px;
+    }
+
+    .podcast-card .listen-link {
+      display: inline-block;
+      padding: 9px 18px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .podcast-card .listen-link:hover { background: rgba(255,255,255,0.3); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 28px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 16px;
+      background: #f7fafc;
+      border-radius: 10px;
+    }
+
+    .stat-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #718096;
+      margin-top: 4px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #a0aec0;
+      font-size: 13px;
+      margin-top: 20px;
+    }
+
+    .footer a {
+      color: #667eea;
+      text-decoration: none;
+    }
+
+    .footer a:hover { text-decoration: underline; }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 30px;
+      color: #a0aec0;
+    }
+
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+    .empty-state h3 {
+      font-size: 18px;
+      margin-bottom: 6px;
+      color: #718096;
+    }
+
+    /* 响应式 */
+    @media (max-width: 860px) {
+      .app { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        max-height: 50vh;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .sidebar-header { width: 100%; text-align: left; border-bottom: none; padding-bottom: 8px; }
+      .calendar { flex: 1; min-width: 240px; }
+      .report-list { flex: 1; min-width: 200px; }
+      .main { padding: 20px; }
+      .report-content { padding: 20px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h1>📅 AI Digest</h1>
+        <div class="subtitle">AI Builders 日报回顾</div>
+      </div>
+
+      <div class="calendar">
+        <div class="calendar-header">
+          <span class="month" id="calendarMonth">2026年4月</span>
+          <div class="calendar-nav">
+            <button onclick="prevMonth()">◀</button>
+            <button onclick="nextMonth()">▶</button>
+          </div>
+        </div>
+        <div class="calendar-weekdays">
+          <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+        </div>
+        <div class="calendar-days" id="calendarDays"></div>
+      </div>
+
+      <div class="report-list">
+        <div class="report-list-title">历史日报</div>
+        <div id="reportList"></div>
+      </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main">
+      <div class="content-container">
+        <div id="reportContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const reports = {
+      "2026-04-24": {
+        title: "AI Builders 日报",
+        date: "2026年4月24日",
+        builders: [
+          {
+            name: "Claude（Anthropic）",
+            content: "交互式图表功能正式上线 Claude Cowork beta，全付费计划均可使用。用户现在可以直接在对话中生成数据可视化，不再需要跳出到外部工具。",
+            link: "https://x.com/claudeai/status/2047047633416397076"
+          },
+          {
+            name: "Sam Altman（OpenAI CEO）",
+            content: "转发了 Claude 的新功能公告，评论称「这些很酷，我认为大多数公司都会想用它们。」",
+            link: "https://x.com/sama/status/2047017964105597009"
+          },
+          {
+            name: "Swyx（AI Engineer / Latent Space）",
+            content: "关于 GPT-Image-2-Thinking 生成需要数十分钟这件事：最好的理解框架是「它在用图像思考」——把算力花在视觉推理上，就像 chain-of-thought 把 token 花在文字推理上一样。当结果值得等待时，慢一点没什么关系。",
+            link: "https://x.com/swyx/status/2047140362771132544"
+          },
+          {
+            name: "Ryo Lu（Cursor 设计）",
+            content: "关于「过度烹饪」的深度思考：产品不断堆积看似合理、整体却混乱的功能。AI 把添加功能的成本压到了接近零，让这个问题更严重了。答案是拨开噪声，回归第一原则。",
+            link: "https://x.com/ryolu_/status/2046957675079237668"
+          },
+          {
+            name: "Aaron Levie（Box CEO）",
+            content: "这可能是软件 headless 化以来最大的新闻——ChatGPT 新 Agent 可以接入任何工具和数据，具备完整的编码和工具调用能力。知识工作自动化真正进入大众可用阶段了。",
+            link: "https://x.com/levie/status/2047028112626749645"
+          },
+          {
+            name: "Guillermo Rauch（Vercel CEO）",
+            content: "Vercel 安全调查最新进展：团队处理了近 PB 量级的日志，发现威胁行为者的活动范围超出了最初的 Context.ai 泄露事件。已与 Microsoft、AWS、Wiz 等合作伙伴深度协作，并通知了其他疑似受害者。",
+            link: "https://x.com/rauchg/status/2047150411170320808"
+          },
+          {
+            name: "Amjad Masad（Replit CEO）",
+            content: "Replit 发布白皮书：将静态分析工具与当前一代 LLM 结合，可显著提升性能表现，某些场景下突破 90%。核心洞见：如果能在现有模型外围搭好正确的脚手架，根本不需要等下一代模型。",
+            link: "https://x.com/amasad/status/2047156858214035590"
+          },
+          {
+            name: "Josh Woodward（Google VP，Gemini）",
+            content: "修了一个小痛点：Gemini 对话分支功能正在向 20% 用户推送，持续扩大覆盖。",
+            link: "https://x.com/joshwoodward/status/2047147030351642914"
+          },
+          {
+            name: "Dan Shipper（Every CEO）",
+            content: "LLM 写代码现在已经超过大多数人类工程师了。那我们还剩什么？真正的前沿是判断力——知道该构建什么、何时停手，以及如何在最后 10% 施展品味，让好作品和伟大作品区分开来。",
+            link: "https://x.com/danshipper/status/2047027507397005367"
+          },
+          {
+            name: "Peter Yang（Roblox 产品）",
+            content: "用心打磨 > 流水线产出。AI 可以处理大部分生成工作，但真正的打磨在最后 10%——你需要手动注入自己的品味。很多人直接跳过了这一步。",
+            link: "https://x.com/petergyang/status/2047124883071816189"
+          }
+        ],
+        blogs: [
+          {
+            source: "Claude Blog",
+            title: "Claude Code 桌面端重新设计：支持多代理并行管理",
+            content: "Anthropic 为 Claude Code 推出了全新桌面端，专为多代理并行编码工作流而设计。新增侧边栏支持跨代码仓库的多并行会话管理，内置终端 + 文件编辑器，支持拖拽式面板布局，macOS 用户还可通过 SSH 连接远程服务器直接运行 Claude Code。",
+            link: "https://claude.com/blog/claude-code-desktop-redesign"
+          }
+        ],
+        podcast: {
+          title: "AI 三明治：人类在 AI 时代的独特价值",
+          podcast: "AI & I by Every",
+          speaker: "Kieran（Quora GM）",
+          summary: "Kieran 提出「AI 三明治」理论：人类是面包（负责开头定义框架和结尾最终判断），AI 是夹心（负责中间的规划、执行、质检）。Compound Engineering 把这套逻辑拆成四阶段，每轮循环积累上下文，让下一轮更快更好。核心反直觉观点：把每次 AI 会话当作投资而非消耗品，价值才能真正复利。",
+          quote: "\"大多数人把 AI 当成一次性对话——问完就走。但真正的价值在于复利。每次 AI 帮助你，你就学到了东西，存下这个教训，下次你就更强。\"",
+          link: "https://www.youtube.com/watch?v=G0LTv8hQ5Cs"
+        },
+        stats: { builders: 15, tweets: 30, podcasts: 1, blogs: 1 }
+      },
+      "2026-04-27": {
+        title: "AI Builders 日报",
+        date: "2026年4月27日",
+        builders: [
+          {
+            name: "Sam Altman（OpenAI CEO）",
+            content: "发出灵魂拷问：「他们怎么能写代码这么快？！」配了代码截图，引发社区热议。大家纷纷猜测 OpenAI 内部是不是又有了大动作。",
+            link: "https://x.com/sama"
+          },
+          {
+            name: "Swyx（AI Engineer / Latent Space）",
+            content: "预告了一个与华人团队合作的神秘项目：「我们在捣鼓点东西，ICML 首尔站之前暂时保密，但记得把日程留好。」",
+            link: "https://x.com/swyx"
+          },
+          {
+            name: "Peter Yang（Roblox 产品）",
+            content: "把 Codex 给 7 岁小孩用，结果让人大开眼界——下一代对 AI 的期待已经完全不同了。",
+            link: "https://x.com/petergyang"
+          },
+          {
+            name: "Amjad Masad（Replit CEO）",
+            content: "精辟三连：2000s 每家都是互联网公司 → 2010s 每家都是软件公司 → 2020s 每家都是 AI 公司。本质都是工具民主化。",
+            link: "https://x.com/amasad"
+          },
+          {
+            name: "Aaron Levie（Box CEO）",
+            content: "「AI 让你获得前所未有的巨大杠杆，这是过去任何工具都无法实现的。」",
+            link: "https://x.com/levie"
+          },
+          {
+            name: "Garry Tan（Y Combinator CEO）",
+            content: "GBrain v0.22 发布：大量搜索检索修复 + 全新评估系统 gbrain-evals。",
+            link: "https://x.com/garrytan"
+          },
+          {
+            name: "Dan Shipper（Every CEO）",
+            content: "关于 AI 的一些观察。",
+            link: "https://x.com/danshipper"
+          }
+        ],
+        blogs: [],
+        podcast: {
+          title: "Scaling Global Organizations in the Age of AI",
+          podcast: "No Priors",
+          speaker: "Bill McDermott（ServiceNow CEO）",
+          summary: "Bill McDermott 和 Sarah 对谈企业 AI 转型：平台替换成本极高（可能达 10 倍）、SaaS 护城河在 AI 时代依然有效、ServiceNow 策略是让 AI 深度嵌入现有工作流而非替换平台。Bill 的人生哲学是「永不满足的饥饿感」——从 16 岁买下熟食店到今天管理 ServiceNow，驱动力始终如一。",
+          quote: "",
+          link: "https://www.youtube.com/watch?v=tNNFJa5pUEg"
+        },
+        stats: { builders: 60, tweets: 25, podcasts: 1, blogs: 0 }
+      },
+      "2026-04-28": {
+        title: "AI Builders 日报",
+        date: "2026年4月28日",
+        builders: [
+          {
+            name: "Claude（Anthropic）",
+            content: "交互式图表和图表功能现已上线 Claude Cowork beta，所有付费计划均可使用。用户可以直接在对话中生成数据可视化，是 Claude 产品化能力的重要升级。",
+            link: "https://x.com/claudeai/status/2047047633416397076"
+          },
+          {
+            name: "Sam Altman（OpenAI CEO）",
+            content: "转发 Claude 新功能并表示：「这些很酷，我认为大多数公司都会想使用它们。」反映出行业对 AI 原生交互图表的高度认可。",
+            link: "https://x.com/sama/status/2047017964105597009"
+          },
+          {
+            name: "Ryo Lu（Cursor Design）",
+            content: "深度思考「过度烹饪」（Overcooking）现象：AI 让添加功能的成本降至接近零，导致产品逐渐堆积出看似合理但整体混乱的功能集。「每次 prompt 都能加点什么，这让克制变得比以前更难。」",
+            link: "https://x.com/ryolu_/status/2046957675079237668"
+          },
+          {
+            name: "Aaron Levie（Box CEO）",
+            content: "ChatGPT 新 Agent 可接入任意工具和数据来源，具备完整编码和工具调用能力。Levie 认为这是软件「无头化」以来最重要的里程碑，将把知识工作 Agent 带给大众。",
+            link: "https://x.com/levie/status/2047028112626749645"
+          },
+          {
+            name: "Guillermo Rauch（Vercel CEO）",
+            content: "Vercel 安全事件持续更新：团队处理近 PB 级日志，发现威胁行为者活动范围远超最初的 Context.ai 泄露事件，主要针对非敏感环境变量的系统性枚举。已与 Microsoft、AWS、Wiz 深化合作。",
+            link: "https://x.com/rauchg/status/2047150411170320808"
+          },
+          {
+            name: "Josh Woodward（Google VP, Gemini）",
+            content: "Gemini Papercut 修复：对话分支功能已向 20% 用户推送，持续扩量中。",
+            link: "https://x.com/joshwoodward/status/2047147030351642914"
+          },
+          {
+            name: "Amjad Masad（Replit CEO）",
+            content: "Replit 发布白皮书：当前一代 LLM 结合静态分析工具，某些场景下性能提升可超过 90%。Replit Agent 现已可从 Gemini Enterprise 直接调用，Replit Security Agent 同步上线。",
+            link: "https://x.com/amasad/status/2047156858214035590"
+          },
+          {
+            name: "Swyx（AI Engineer / Latent Space）",
+            content: "GPT-Image-2-Thinking 最佳解读：它不是新的图像模型，而是一个图像 Agent——以搜索和 Photoshop 作为工具在 Agent 循环中运行，能自主合成、检查并迭代自己的输出。",
+            link: "https://x.com/swyx/status/2047140362771132544"
+          },
+          {
+            name: "Garry Tan（YC President）",
+            content: "Agent 系统设计实操经验：把相邻 skills 合并为带分支参数的大 skill，比拆分成多个小 skill 效果更好——更少的 resolver 上下文，更短的解析路径，更低的 context bloat。",
+            link: "https://x.com/garrytan/status/2047183884266402275"
+          },
+          {
+            name: "Dan Shipper（Every CEO）",
+            content: "LLM 写代码已超过大多数人类工程师，那人类还剩什么？Every 的播客探讨了 Compound Engineering 框架下的人机分工：人类是「面包」，AI 是「夹心」。",
+            link: "https://x.com/danshipper/status/2047027507397005367"
+          }
+        ],
+        blogs: [
+          {
+            source: "Claude Blog",
+            title: "Claude Code 桌面应用重新设计：专为并行 Agent 工作流打造",
+            content: "Anthropic 为 Claude Code 推出专用桌面应用。核心升级：多会话并行侧边栏管理、Side Chat（⌘+;）随时插入问题分支、内置终端+文件编辑器+diff viewer+HTML/PDF 预览，全部支持拖拽布局。适用所有 Pro、Max、Team、Enterprise 及 API 用户。",
+            link: "https://claude.com/blog/claude-code-desktop-redesign"
+          }
+        ],
+        podcast: {
+          title: "The AI Sandwich: Where Humans Excel in an AI World",
+          podcast: "AI & I by Every",
+          speaker: "Kieran Claassen（Quora GM，Compound Engineering 框架创始人）",
+          summary: "AI 三明治理论：人类是面包（负责开头定义框架、结尾最终打磨），AI 是夹心（负责中间的执行）。工作流五步：Ideate → Brainstorm → Plan → Work → Review，中间已基本被 AI 解决。Compound 复利机制：每次 AI 帮你完成任务，把学到的经验存回 repo，下次 Agent 自动继承。",
+          quote: "\"The work phase is kind of done. If you put in a good plan, it executes. I trust it. Now the question is: where do I still need to be?\"",
+          link: "https://www.youtube.com/watch?v=G0LTv8hQ5Cs"
+        },
+        stats: { builders: 15, tweets: 10, podcasts: 1, blogs: 1 }
+      },
+      "2026-04-29": {
+        title: "AI Builders 日报",
+        date: "2026年4月29日",
+        builders: [
+          {
+            name: "Sam Altman（OpenAI CEO）",
+            content: "转发 ChatGPT 新 Agent 功能，称「这些很酷，我认为大多数公司都会想使用它们。」该功能让 Agent 能访问任意工具和数据，实现完整编码与工具调用，被视为软件 headless 化的重大进展。",
+            link: "https://x.com/sama/status/2047017964105597009"
+          },
+          {
+            name: "Claude（Anthropic）",
+            content: "交互式图表功能上线 Claude Cowork beta，所有付费计划可用。用户可直接在对话中生成数据可视化，包括各类交互式图表和示意图。",
+            link: "https://x.com/claudeai/status/2047047633416397076"
+          },
+          {
+            name: "Ryo Lu（Cursor Design）",
+            content: "「过度烹饪」深度思考：产品累积看似合理但整体混乱的功能。AI 让添加功能成本降至接近零，使问题恶化。核心问题在于大多数「新想法」只是旧概念的新包装。需要看透混乱，回归事物本质。",
+            link: "https://x.com/ryolu_/status/2046957675079237668"
+          },
+          {
+            name: "Aaron Levie（Box CEO）",
+            content: "ChatGPT 新 Agent 可访问任意工具和数据，支持完整编码与工具调用。知识工作者可获得可定制的智能助手，是软件 headless 化以来最大的新闻。",
+            link: "https://x.com/levie/status/2047028112626749645"
+          },
+          {
+            name: "Guillermo Rauch（Vercel CEO）",
+            content: "Vercel 安全调查更新：处理近 PB 级日志，威胁行为者通过分发恶意软件窃取 API Token，快速枚举非敏感环境变量。已与 Microsoft、AWS、Wiz 等深入合作并通知其他受害者。",
+            link: "https://x.com/rauchg/status/2047150411170320808"
+          },
+          {
+            name: "Swyx（AI Engineer）",
+            content: "GPT-Image-2-Thinking 深度解读：Image-2 是图像模型，Image-2-Thinking 是图像 Agent，拥有搜索和 Photoshop 作为工具，能在 Agent 循环中搜索、合成和审查自己的作品。",
+            link: "https://x.com/swyx/status/2047140362771132544"
+          },
+          {
+            name: "Amjad Masad（Replit CEO）",
+            content: "Replit 白皮书：结合静态分析工具，当前 LLM 性能提升超 90%。Replit Agent 现可通过 Gemini Enterprise 调用，Security Agent 同步上线审查应用安全。",
+            link: "https://x.com/amasad/status/2047156858214035590"
+          },
+          {
+            name: "Dan Shipper（Every CEO）",
+            content: "与 Compound Engineering 创建者 Kieran 对谈「AI 三明治」：人类是面包（开头设定框架、结尾最终打磨），AI 是夹心（中间规划、执行、检查）。中间的执行层已基本被解决。",
+            link: "https://x.com/danshipper/status/2047027507397005367"
+          },
+          {
+            name: "Garry Tan（YC CEO）",
+            content: "AI Skill 组织经验：更少但更厚的 Skill 使 Resolver 更短，减少上下文膨胀。组合更大 Skill 配合分支参数比多个小 Skill 更有效。",
+            link: "https://x.com/garrytan/status/2047183884266402275"
+          },
+          {
+            name: "Peter Yang（Roblox 产品）",
+            content: "「工艺 > 粗制滥造」——用 AI 生成东西很棒，但工艺在于最后 10% 的人工打磨，用品味让作品值得骄傲。很多人连这一步都懒得做。",
+            link: "https://x.com/petergyang/status/2047124883071816189"
+          },
+          {
+            name: "Josh Woodward（Google VP, Gemini）",
+            content: "Gemini Papercut 修复：对话分支功能已向 20% 用户推送，正在逐步扩大覆盖。",
+            link: "https://x.com/joshwoodward/status/2047147030351642914"
+          },
+          {
+            name: "Peter Steinberger（OpenClaw）",
+            content: "分享 React 高密度编码示例——一行 8 个组件，展示现代前端工具的极限压缩能力。",
+            link: "https://x.com/steipete/status/2046991196786979210"
+          },
+          {
+            name: "Nikunj Kothari（Railway）",
+            content: "「未来每个像素都会实时生成，只是时间问题，不是会不会的问题。」分享实时生成式演示。",
+            link: "https://x.com/nikunj/status/2047024714116419665"
+          }
+        ],
+        blogs: [
+          {
+            source: "Claude Blog",
+            title: "Claude Code 桌面应用重新设计：专为并行 Agent 工作流打造",
+            content: "Anthropic 为 Claude Code 推出专用桌面应用重构。核心能力：多会话并行管理侧边栏、Side Chat 分支对话（⌘+;）、内置终端+文件编辑器+Diff 查看器+HTML/PDF 预览、全部支持拖拽布局。CLI 插件完全兼容，macOS 和 Linux 均支持 SSH 远程连接。三种视图模式：Verbose、Normal、Summary。",
+            link: "https://claude.com/blog/claude-code-desktop-redesign"
+          }
+        ],
+        podcast: {
+          title: "The AI Sandwich: Where Humans Excel in an AI World",
+          podcast: "AI & I by Every",
+          speaker: "Kieran（Quora GM，Compound Engineering 创建者）",
+          summary: "「AI 三明治」理论：人类是面包（开头定义框架、结尾打磨），AI 是夹心（规划、执行、检查）。工作流五步：Ideate → Brainstorm → Plan → Work → Review → Compound。Compound 是最关键步骤——每次迭代经验反馈系统，让 AI 下次不再犯同样错误。Dan Shipper 补充：语言模型「被关在盒子里一年」，输出必然带通用性，真正做好产品需要人类在两端设定框架和确保细节品味。Kieran 用音乐类比：Suno 可生成歌曲，但无法替代现场演出。",
+          quote: "\"Most people are using AI for single conversations — ask a question, get an answer, done. But the real value comes from compounding. Every time AI helps you, you learn, you store the lesson, and next time you're better.\"",
+          link: "https://www.youtube.com/watch?v=G0LTv8hQ5Cs"
+        },
+        stats: { builders: 15, tweets: 30, podcasts: 1, blogs: 1 }
+      },
+      "2026-04-30": {
+        title: "AI Builders Digest",
+        date: "2026年4月30日",
+        builders: [
+          {
+            name: "Sam Altman (OpenAI CEO)",
+            content: "用网络流行语调侃 OpenAI 前端和后端能力的对比：「we still get looksmaxxed on frontend a little but we IQmog hard now」——获超 14000 赞，近期互动最高。随后转发 AI 编程速度讨论视频惊叹「how can they write code so fast?!」，并承诺改进前端体验。",
+            link: "https://x.com/sama/status/2048160404376105179"
+          },
+          {
+            name: "Swyx (AI Engineer)",
+            content: "预告与 @hhua_ 合作的新项目：「btw we are cooking something with @hhua_（not final yet but keep calendar open after ICML in Seoul）」。同时持续发酵「code is not cheap」议题，认为 PM 和工程师对同一场景的理解存在巨大差异。",
+            link: "https://x.com/swyx/status/2048126046487322835"
+          },
+          {
+            name: "Peter Yang (Roblox Product)",
+            content: "「如果你想知道下一代人期望 AI 能做什么，就让 7 岁小孩用 Codex」——孩子的反应是「它不能马上给我做一个宠物龙养成游戏？我无聊了。」同时呼吁寻找高质量人工策划的 Skill 仓库，对现有仓库质量不满。自嘲经常要叫 Codex 帮修 OpenClaw 配置 😂",
+            link: "https://x.com/petergyang/status/2048220045726322934"
+          },
+          {
+            name: "Nan Yu (Linear Head of Product)",
+            content: "关于技术采用节奏的金句：「站在最前沿意味着你将不断改变做法；最佳位置是稍微落后半步，用相对成熟但足够新的方案。」——获赞 55。",
+            link: "https://x.com/thenanyu/status/2048172709075402787"
+          },
+          {
+            name: "Amanda Askell (Anthropic)",
+            content: "飞行模拟器感悟：「业余塞斯纳飞行员可能有点无聊，但业余战斗机飞行员一定很有趣。」——76 赞。",
+            link: "https://x.com/AmandaAskell/status/2048294481955631163"
+          },
+          {
+            name: "Amjad Masad (Replit CEO)",
+            content: "企业进化史金句（369 赞）：2000s 每家都是互联网公司 → 2010s 每家都是软件公司 → 2020s 每家都是 AI 公司 → **2025+ 每家都是网络安全公司**。随着 AI 深度渗透，网络安全将成为每家公司的核心命题。",
+            link: "https://x.com/amasad/status/2048265772775162078"
+          },
+          {
+            name: "Aaron Levie (Box CEO)",
+            content: "AI 赋能个人的历史性机遇（396 赞）：AI 让任何领域的人都能获得前所未有的杠杆效应。有野心 + 核心能力的人可以跨越历史上需要多年经验才能达到的门槛。「这些人看起来会像来自未来，但他们能帮你搞清楚方向。」",
+            link: "https://x.com/levie/status/2048223146063609965"
+          },
+          {
+            name: "Garry Tan (YC CEO)",
+            content: "双发布：GBrain v0.22（搜索检索大量修复 + 独立评估系统 gbrain-evals）+ GStack Browser 正式发布（新增 /open-gstack-browser skill，让 Claude Code 并行控制浏览器）——111 赞。",
+            link: "https://x.com/garrytan/status/2048290087318773807"
+          },
+          {
+            name: "Zara Zhang (Builder / Harvard'17)",
+            content: "「写作 ≠ 生成文本」——引用深刻观点：写作 ≠ 生成文本、做产品 ≠ 写 PRD、设计 ≠ 做 Mockup、工程 ≠ 写代码。「当我坐在电脑前开始打字时，那不是写作的开始，那是最后一步。80% 的写作已经在脑子里完成了。」——75 赞。",
+            link: "https://x.com/zarazhangrui/status/2048101948826751429"
+          },
+          {
+            name: "Nikunj Kothari (FPV Ventures Partner)",
+            content: "「简洁与清晰是大多数写作中缺失的东西」（84 赞）。如果思路还没清晰就不要把混乱的想法丢给读者。最好的写作能干净地传达核心观点，同时留下值得探索的线索。",
+            link: "https://x.com/nikunj/status/2048107926012002461"
+          },
+          {
+            name: "Peter Steinberger (OpenClaw / OpenAI)",
+            content: "三连发：Summarize v0.14.0（新增 GPT-5.5 Fast 模式、浏览器扩展支持 Reddit 提取、本地 PDF 提取）+ CodexBar v0.23（Mistral 支持、Claude Designs 用量统计、Cursor Extra 支持）+ 调侃 GitHub 服务器被搞崩（381 赞）。",
+            link: "https://x.com/steipete/status/2048185940267380815"
+          },
+          {
+            name: "Dan Shipper (Every CEO)",
+            content: "「我们观察到的永远不是模型本身，而是通过我们的提问方式暴露出来的模型。」（131 赞）一个深刻的哲学观察：模型的能力表现取决于你如何与它交互。",
+            link: "https://x.com/danshipper/status/2048026505461080076"
+          },
+          {
+            name: "Peter Steinberger (OpenClaw)",
+            content: "GitHub 服务器被自己的项目流量搞崩了，调侃 GitHub 团队太给力。（见上方合并条目）",
+            link: "https://x.com/steipete/status/2048185940267380815"
+          }
+        ],
+        blogs: [
+          {
+            source: "Claude Blog",
+            title: "Claude Code 桌面应用全面重新设计：专为多 Agent 并行工作流打造",
+            content: "Anthropic 为 Claude Code 推出全面重设计的桌面应用。核心升级：多会话并行侧边栏管理、侧边对话（⌘+;）不中断主任务插问、集成终端+文件编辑器+Diff 查看器+HTML/PDF 预览、全部支持拖拽布局、macOS/Linux SSH 远程连接、三种视图模式（Verbose / Normal / Summary）。现已对所有 Pro / Max / Team / Enterprise 用户开放。",
+            link: "https://claude.com/blog/claude-code-desktop-redesign"
+          }
+        ],
+        podcast: {
+          title: "AI 三明治：人类在 AI 时代的独特价值",
+          podcast: "AI & I by Every",
+          speaker: "Kieran Claassen（Quora GM，Compound Engineering 框架创造者）",
+          summary: "Kieran 提出「AI 三明治」理论：人类是面包（负责开头定义框架 + 结尾最终打磨），AI 是夹心（负责中间规划、执行、检查）。Compound Engineering 工作流五步：Brainstorm → Ideate → Plan → Work → Review，其中 Work 阶段几乎已被 AI 解决。最关键的是 Compound 积累机制——每次 AI 完成任务后的经验沉淀回系统，下次 AI 基于这些知识做得更好，这就是复利的力量。Kieran 以音乐类比：Suno 能生成歌曲，但无法取代现场演奏的情感连接。",
+          quote: "\"Most people are using AI for single conversations — ask a question, get an answer, done. But the real value comes from compounding. Every time AI helps you, you learn, you store the lesson, and next time you're better.\"",
+          link: "https://www.youtube.com/watch?v=G0LTv8hQ5Cs"
+        },
+        stats: { builders: 60, tweets: 25, podcasts: 1, blogs: 1 }
+      },
+      "2026-04-23": {
+        title: "AI Builders Digest",
+        date: "2026年4月23日",
+        builders: [
+          {
+            name: "Claude (Anthropic)",
+            content: "交互式图表和图表功能现已上线 Claude Cowork beta，所有付费计划均可使用。这项新功能让用户可以直接在对话中生成数据可视化。",
+            link: "https://x.com/claudeai/status/2047047633416397076"
+          },
+          {
+            name: "Sam Altman (OpenAI CEO)",
+            content: "转发了 Claude 的新功能，称「这些很酷，我认为大多数公司都会想使用它们。」",
+            link: "https://x.com/sama/status/2047017964105597009"
+          },
+          {
+            name: "Ryo Lu (Cursor Design)",
+            content: "关于「过度烹饪」的深度思考：产品累积看似合理但整体混乱的功能。AI 让添加功能的成本降至接近零，使问题恶化。大多数「新想法」只是旧概念的新包装。需要的是看透混乱，回归事物本质。",
+            link: "https://x.com/ryolu_/status/2046957675079237668"
+          },
+          {
+            name: "Aaron Levie (Box CEO)",
+            content: "这可能是软件 headless 化以来最大的新闻，将把知识工作代理带给大众。ChatGPT 新代理可以访问您想要的任何工具和数据，实现完整编码和工具调用能力。",
+            link: "https://x.com/levie/status/2047028112626749645"
+          },
+          {
+            name: "Guillermo Rauch (Vercel CEO)",
+            content: "Vercel 安全调查详细更新：团队处理了近 PB 级别的日志，威胁行为者活动范围超出最初的 Context.ai 泄露。已与 Microsoft、AWS、Wiz 等行业合作伙伴深入合作，并通知了其他疑似受害者。",
+            link: "https://x.com/rauchg/status/2047150411170320808"
+          },
+          {
+            name: "Josh Woodward (Google VP)",
+            content: "Gemini Papercut 修复：对话分支功能已向 20% 用户推送中。",
+            link: "https://x.com/joshwoodward/status/2047147030351642914"
+          },
+          {
+            name: "Amjad Masad (Replit CEO)",
+            content: "Replit 发布白皮书，证明结合静态分析工具可以从当前一代 LLM 获得显著更好的性能，某些情况下超过 90%。",
+            link: "https://x.com/amasad/status/2047156858214035590"
+          }
+        ],
+        blogs: [
+          {
+            source: "Claude Blog",
+            title: "Claude Code 桌面应用重新设计",
+            content: "Anthropic 为 Claude Code 推出了专门的桌面应用，解决用户在命令行使用时的痛点。新版本支持多会话管理，可以同时打开多个 AI 对话，像浏览器标签页一样切换。集成终端功能让你不用再开额外的窗口。macOS 用户还可以通过 SSH 连接到远程服务器，在远程机器上直接运行 Claude Code。",
+            link: "https://claude.com/blog/claude-code-desktop-redesign"
+          }
+        ],
+        podcast: {
+          title: "The AI Sandwich: Where Humans Excel in an AI World",
+          podcast: "AI & I by Every",
+          speaker: "Kieran (Quora GM)",
+          summary: "Kieran 是 Quora GM，也是 Compound Engineering 框架的创建者。他提出了一个叫「AI 三明治」的理论：人类是面包（负责开头设定框架、和结尾最终打磨），AI 是夹心（负责中间的规划、执行、检查）。",
+          quote: "\"Most people are using AI for single conversations — ask a question, get an answer, done. But the real value comes from compounding. Every time AI helps you, you learn, you store the lesson, and next time you're better.\"",
+          link: "https://www.youtube.com/watch?v=G0LTv8hQ5Cs"
+        },
+        stats: { builders: 15, tweets: 30, podcasts: 1, blogs: 1 }
+      }
+    };
+
+    let currentMonth = new Date(2026, 3, 1);
+    let selectedDate = null;
+
+    function renderCalendar() {
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth();
+      document.getElementById('calendarMonth').textContent = year + '年' + (month + 1) + '月';
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startDay = firstDay.getDay();
+      const totalDays = lastDay.getDate();
+
+      const today = new Date();
+      const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+      let html = '';
+      const prevMonth = new Date(year, month, 0);
+      for (let i = startDay - 1; i >= 0; i--) {
+        html += '<div class="calendar-day other-month">' + (prevMonth.getDate() - i) + '</div>';
+      }
+      for (let d = 1; d <= totalDays; d++) {
+        const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        let cls = 'calendar-day';
+        if (dateStr === todayStr) cls += ' today';
+        if (reports[dateStr]) cls += ' has-report';
+        if (selectedDate === dateStr) cls += ' selected';
+        html += '<div class="' + cls + '" onclick="selectDate(\'' + dateStr + '\')">' + d + '</div>';
+      }
+      const remaining = 42 - (startDay + totalDays);
+      for (let i = 1; i <= remaining; i++) {
+        html += '<div class="calendar-day other-month">' + i + '</div>';
+      }
+      document.getElementById('calendarDays').innerHTML = html;
+    }
+
+    function prevMonth() { currentMonth.setMonth(currentMonth.getMonth() - 1); renderCalendar(); }
+    function nextMonth() { currentMonth.setMonth(currentMonth.getMonth() + 1); renderCalendar(); }
+
+    function selectDate(dateStr) {
+      selectedDate = dateStr;
+      renderCalendar();
+      renderReport(dateStr);
+      renderReportList();
+    }
+
+    function renderReportList() {
+      const sorted = Object.keys(reports).sort().reverse();
+      let html = '';
+      sorted.forEach(function(d) {
+        const r = reports[d];
+        const dObj = new Date(d);
+        const label = (dObj.getMonth() + 1) + '月' + dObj.getDate() + '日';
+        html += '<div class="report-item' + (selectedDate === d ? ' active' : '') + '" onclick="selectDate(\'' + d + '\')">';
+        html += '<div class="date">' + label + '</div>';
+        html += '<div class="preview">' + (r.builders[0] ? r.builders[0].name : '') + ' 等更新</div>';
+        html += '</div>';
+      });
+      document.getElementById('reportList').innerHTML = html;
+    }
+
+    function renderReport(dateStr) {
+      const r = reports[dateStr];
+      const c = document.getElementById('reportContent');
+
+      if (!r) {
+        c.innerHTML = '<div class="report-header"><h1>📅 AI Builders Digest</h1><div class="date">' + dateStr + '</div></div><div class="report-content"><div class="empty-state"><div class="icon">📭</div><h3>暂无日报</h3><p>这一天还没有生成日报</p></div></div>';
+        return;
+      }
+
+      let bh = '';
+      r.builders.forEach(function(b) {
+        bh += '<div class="builder-card"><div class="builder-name">' + b.name + '</div><div class="builder-content">' + b.content + '</div><a class="builder-link" href="' + b.link + '" target="_blank">🔗 查看原文</a></div>';
+      });
+
+      let blh = '';
+      r.blogs.forEach(function(b) {
+        blh += '<div class="blog-card"><div class="blog-source">' + b.source + '</div><div class="blog-title">' + b.title + '</div><div class="blog-content">' + b.content + '</div><a class="blog-link" href="' + b.link + '" target="_blank">🔗 阅读原文</a></div>';
+      });
+
+      c.innerHTML = '<div class="report-header"><h1>' + r.title + '</h1><div class="date">' + r.date + '</div></div><div class="report-content">' +
+
+        '<div class="quick-nav">' +
+          '<a class="quick-nav-btn" href="#twitter">💬 X / Twitter</a>' +
+          '<a class="quick-nav-btn" href="#blogs">📝 Official Blogs</a>' +
+          '<a class="quick-nav-btn" href="#podcasts">🎧 Podcasts</a>' +
+        '</div>' +
+
+        '<div class="section" id="twitter"><h2 class="section-title">💬 X / Twitter</h2>' + bh + '</div>' +
+        '<div class="section" id="blogs"><h2 class="section-title">📝 Official Blogs</h2>' + blh + '</div>' +
+        '<div class="section" id="podcasts"><h2 class="section-title">🎧 Podcasts</h2>' +
+          '<div class="podcast-card"><div class="podcast-title">' + r.podcast.title + '</div><div class="speaker">' + r.podcast.podcast + ' · ' + r.podcast.speaker + '</div><div class="summary">' + r.podcast.summary + '</div><div class="quote">' + r.podcast.quote + '</div><a class="listen-link" href="' + r.podcast.link + '" target="_blank">▶️ 收听播客</a></div>' +
+        '</div>' +
+
+        '<div class="stats">' +
+          '<div class="stat-item"><div class="stat-number">' + r.stats.builders + '</div><div class="stat-label">追踪 Builders</div></div>' +
+          '<div class="stat-item"><div class="stat-number">' + r.stats.tweets + '</div><div class="stat-label">推文总数</div></div>' +
+          '<div class="stat-item"><div class="stat-number">' + r.stats.podcasts + '</div><div class="stat-label">播客新剧集</div></div>' +
+          '<div class="stat-item"><div class="stat-number">' + r.stats.blogs + '</div><div class="stat-label">博客新文章</div></div>' +
+        '</div>' +
+
+        '<div class="footer">Generated through <a href="https://github.com/zarazhangrui/follow-builders" target="_blank">Follow Builders</a></div>' +
+      '</div>';
+    }
+
+    renderCalendar();
+    renderReportList();
+    // 默认选中最新日期
+    const latestDate = Object.keys(reports).sort().reverse()[0];
+    selectDate(latestDate);
+  </script>
+</body>
+</html>
