@@ -516,6 +516,90 @@
 
   <script>
     const reports = {
+      "2026-05-12": {
+        title: "AI Builders Digest",
+        date: "2026年5月12日",
+        builders: [
+          {
+            name: "Sam Altman (@sama)",
+            content: "感叹 AI 编程速度：转发 AI 极速写代码视频，评论「他们怎么能写得这么快？！」（赞 2574）；另称 OpenAI 前端仍有不足但「我们会修复它」，还补了句「我们在 IQ 上碾压」（赞 14293）。",
+            link: "https://x.com/sama/status/2048160404376105179"
+          },
+          {
+            name: "Swyx (@swyx)",
+            content: "暗示与 @hhua_ 正在合作未曝光项目，建议在首尔 ICML 结束后腾出日历；转发「代码并不便宜」观点；思考同一场景下 PM 和工程师各自在想什么。",
+            link: "https://x.com/swyx/status/2048126046487322835"
+          },
+          {
+            name: "Peter Yang (@petergyang)",
+            content: "分享与 7 岁孩子用 Codex 的趣事——孩子期待 AI 立刻生成养宠物龙游戏，等不了就喊无聊；征集高质量人工策展技能库；吐槽经常要让 Codex 修 OpenClaw 配置。",
+            link: "https://x.com/petergyang/status/2048220045726322934"
+          },
+          {
+            name: "Nan Yu (@thenanyu)",
+            content: "观点：站在技术最前沿代价高，因为要不断改变工作方式。最佳位置是「稍微落后一点」——选相对新、但已经历市场检验的技术（赞 55）。",
+            link: "https://x.com/thenanyu/status/2048172709075402787"
+          },
+          {
+            name: "Amanda Askell (@AmandaAskell)",
+            content: "分享飞行模拟器体验感悟：驾驶 Cessna 有点无聊，驾驶战斗机才刺激（赞 76）。",
+            link: "https://x.com/AmandaAskell/status/2048294481955631163"
+          },
+          {
+            name: "Amjad Masad (@amasad)",
+            content: "科技公司身份演变：2000s 互联网→2010s 软件→2020s AI→2025+ 网络安全。AI 深度渗透后，网络安全将成为每家公司的核心命题（赞 369）。",
+            link: "https://x.com/amasad/status/2048265772775162078"
+          },
+          {
+            name: "Aaron Levie (@levie)",
+            content: "长文点评：AI 提供前所未有的杠杆效应，处于历史性时刻——有野心、有核心技能的人可以突破经验年限限制。善用 AI 的人将大幅领先，这些人「看起来像来自未来」（赞 396）。",
+            link: "https://x.com/levie/status/2048223146063609965"
+          },
+          {
+            name: "Garry Tan (@garrytan)",
+            content: "发布 GBrain v0.22（改进搜索检索、新增独立 eval 仓库）+ GStack Browser（Claude Code 旁边同步控制浏览器，通过 /open-gstack-browser 启动，免费安装）（赞 111）。",
+            link: "https://x.com/garrytan/status/2048278995121094868"
+          },
+          {
+            name: "Zara Zhang (@zarazhangrui)",
+            content: "「坐下来开始打字不是写作的开始，而是最后一步。80% 的写作已经在脑海中完成了。」类比：写作≠生成文字，产品建设≠写 PRD，设计≠做 mockup，工程≠写代码（赞 75）。",
+            link: "https://x.com/zarazhangrui/status/2048101948826751429"
+          },
+          {
+            name: "Nikunj Kothari (@nikunj)",
+            content: "写作心得：简洁和清晰是大多数写作缺少的。常因思路不够清晰而放弃公开发表，不愿把泥泞想法强加给读者；最好的写作能清晰传递核心，留有未探索线索（赞 84）。",
+            link: "https://x.com/nikunj/status/2048056524845482131"
+          },
+          {
+            name: "Peter Steinberger (@steipete)",
+            content: "三连发布：Summarize 0.14.0（GPT-5.5 快速模式、Reddit 帖子提取、本地 PDF 提取）+ CodexBar 0.23（Mistral 支持、Claude/GPT-5.5 用量追踪、界面优化）+ 赞扬 GitHub 工程师在服务器被压垮时仍撑着（赞 381）。",
+            link: "https://x.com/steipete/status/2048252455817785357"
+          },
+          {
+            name: "Dan Shipper (@danshipper)",
+            content: "「我们观察到的永远不是模型本身，只是模型在我们提问方式下的表现。」提醒 AI 评测方法的局限——方法决定结论（赞 131）。",
+            link: "https://x.com/danshipper/status/2048026505461080076"
+          }
+        ],
+        blogs: [
+          {
+            source: "Claude Blog",
+            title: "Claude Code 桌面应用重新设计：支持并行 Agent 管理",
+            content: "全新桌面应用支持多会话侧边栏（按状态/项目/环境筛选）、拖拽布局、集成终端与文件编辑器、高性能 diff 查看器、HTML/PDF 预览。新增侧边对话（⌘+;）不干扰主任务。适用于 Pro/Max/Team/Enterprise 及 API 用户。",
+            link: "https://claude.com/blog/claude-code-desktop-redesign"
+          }
+        ],
+        podcast: {
+          title: "The AI Sandwich: Where Humans Excel in an AI World",
+          podcast: "AI & I by Every",
+          speaker: "Kieran（Quora GM，Compound Engineering 框架创始人）",
+          summary: "「AI 三明治」：人类是面包（设定意图 + 最终打磨），AI 是夹心（执行）。Compound Engineering 五阶段：Brainstorm→Ideate→Plan→Work→Review，其中 Work 已基本被 AI 解决，真正需要人的是两端。最核心是「Compound」机制——知识积累复利。",
+          quote: "\"Humans are the bread in the sandwich, and the AI is in the middle.\"",
+          link: "https://www.youtube.com/watch?v=G0LTv8hQ5Cs"
+        },
+        stats: { builders: 60, tweets: 25, podcasts: 1, blogs: 1 }
+      },
+
       "2026-05-09": {
         title: "AI Builders Digest",
         date: "2026年5月9日",
