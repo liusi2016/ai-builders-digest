@@ -516,6 +516,90 @@
 
   <script>
     const reports = {
+      "2026-05-15": {
+        title: "AI Builders Digest",
+        date: "2026年5月15日",
+        builders: [
+          {
+            name: "Sam Altman (@sama)",
+            content: "感叹 AI 编程速度：「他们怎么能写得这么快？！」；称 OpenAI 在 IQ 上已经碾压，前端颜值稍有不足但会持续改进（赞 14293）。",
+            link: "https://x.com/sama/status/2048160404376105179"
+          },
+          {
+            name: "Swyx (@swyx)",
+            content: "与 @hhua_ 正在秘密筹备新项目，ICML 首尔结束后公布；支持「代码并不便宜」观点；思考同一场景下 PM 和工程师各自的不同视角。",
+            link: "https://x.com/swyx/status/2048126046487322835"
+          },
+          {
+            name: "Peter Yang (@petergyang)",
+            content: "7 岁孩子用 Codex 直接质问：为什么不能立刻生成养宠物龙游戏？这就是下一代对 AI 的期待。同时征集高质量人工精选 skill 仓库（赞 96）。",
+            link: "https://x.com/petergyang/status/2048220045726322934"
+          },
+          {
+            name: "Nan Yu (@thenanyu)",
+            content: "站在技术最前沿代价高，最佳位置是「稍微落后一点」——用相对新但已经历市场检验的技术。另发声呼吁西海岸城市大量建房（赞 55）。",
+            link: "https://x.com/thenanyu/status/2048172709075402787"
+          },
+          {
+            name: "Amanda Askell (@AmandaAskell)",
+            content: "飞行模拟器感悟：驾驶 Cessna 有点无聊，驾驶战斗机才真的刺激。复杂度和挑战性才是乐趣来源（赞 76）。",
+            link: "https://x.com/AmandaAskell/status/2048294481955631163"
+          },
+          {
+            name: "Amjad Masad (@amasad)",
+            content: "时代进化论：2000s 互联网→2010s 软件→2020s AI→2025+ 网络安全。AI 深度渗透后，每家公司都将成为网络安全公司（赞 369）。",
+            link: "https://x.com/amasad/status/2048265772775162078"
+          },
+          {
+            name: "Aaron Levie (@levie)",
+            content: "AI 给了每个人前所未有的杠杆力，有野心有核心技能的人现在可以突破资历门槛。善用 AI 的人将大幅领先，公司应该积极发现并重用这些「来自未来的人」（赞 396）。",
+            link: "https://x.com/levie/status/2048223146063609965"
+          },
+          {
+            name: "Garry Tan (@garrytan)",
+            content: "发布 GBrain v0.22（改进搜索检索、独立 eval 仓库）+ GStack Browser（在 Claude Code 旁同步控制浏览器，/open-gstack-browser 启动，免费安装）（赞 111）。",
+            link: "https://x.com/garrytan/status/2048278995121094868"
+          },
+          {
+            name: "Zara Zhang (@zarazhangrui)",
+            content: "「坐下来打字是写作最后一步，80% 的写作在脑海中已完成。」类比：写作≠生成文字，产品建设≠写PRD，设计≠做mockup，工程≠写代码（赞 75）。",
+            link: "https://x.com/zarazhangrui/status/2048101948826751429"
+          },
+          {
+            name: "Nikunj Kothari (@nikunj)",
+            content: "写作心得：简洁和清晰是大多数写作最缺少的东西。真正好的写作能清晰传递核心，把一根快成熟但未完全展开的线索分享出去（赞 84）。",
+            link: "https://x.com/nikunj/status/2048056524845482131"
+          },
+          {
+            name: "Peter Steinberger (@steipete)",
+            content: "Summarize 0.14.0 发布（GPT-5.5 快速模式、Reddit 帖子提取、本地 PDF 提取）+ CodexBar 0.23（Mistral 支持、Claude/GPT-5.5 用量追踪、界面优化）（赞 381）。",
+            link: "https://x.com/steipete/status/2048275589224628677"
+          },
+          {
+            name: "Dan Shipper (@danshipper)",
+            content: "「我们观察到的从来不是模型本身，而是模型在我们提问方式下的表现。」评测方法决定结论，要警惕观察者效应（赞 131）。",
+            link: "https://x.com/danshipper/status/2048026505461080076"
+          }
+        ],
+        blogs: [
+          {
+            source: "Claude Blog",
+            title: "Claude Code 桌面应用重新设计：支持并行 Agent 管理",
+            content: "Anthropic 为 Claude Code 推出专属桌面应用，支持多会话侧边栏管理、拖拽式布局、集成终端与文件编辑器，针对并行 Agent 工作流做全面优化。标志着 AI 辅助开发从单线程走向多线程并行协作。",
+            link: "https://claude.com/blog/claude-code-desktop-redesign"
+          }
+        ],
+        podcast: {
+          title: "The AI Sandwich: Where Humans Excel in an AI World",
+          podcast: "AI & I by Every",
+          speaker: "Kieran（Quora GM，Compound Engineering 框架创建者）",
+          summary: "「AI 三明治」理论：人类是面包（设定框架+最终打磨），AI 是夹心（规划与执行）。Compound Engineering 四阶段：Brainstorm（人类主导）、Plan（AI辅助）、Work（AI主导，已基本被解决）、Review（AI辅助质检）。核心：如果你想让某件作品属于你，就不能完全自动化。",
+          quote: "\"Humans are the bread in the sandwich, and the AI is in the middle.\"",
+          link: "https://www.youtube.com/watch?v=G0LTv8hQ5Cs"
+        },
+        stats: { builders: 60, tweets: 23, podcasts: 1, blogs: 1 }
+      },
+
       "2026-05-12": {
         title: "AI Builders Digest",
         date: "2026年5月12日",
